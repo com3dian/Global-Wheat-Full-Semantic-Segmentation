@@ -4,7 +4,9 @@ This repo is for the Wageningen team for the *Global Wheat Full Semantic Segment
 
 ## Useful links
 [Competition page](https://www.codabench.org/competitions/5905/#/pages-tab)
+
 [Dataset Huggingface](https://huggingface.co/datasets/XIANG-Shuai/GWFSS-competition)
+
 [Dataset Webpage](https://www.global-wheat.com/)
 
 ## Competition
@@ -33,7 +35,9 @@ Splits: Pretraining, Train, Validation
 - [x] Training data: Supervised fine-tuning data—99 images from 9 domains (11 images per domain), resolution: 512×512 pixels
 - [x] Validation data: Used for model evaluation—99 images from 9 domains (11 images per domain), resolution: 512×512 pixels. Submit predictions to CondaBench to obtain mIoU scores.
 
+```python
 
+```
 
 
 
