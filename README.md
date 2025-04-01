@@ -36,7 +36,10 @@ Splits: Pretraining, Train, Validation
 - [x] Validation data: Used for model evaluation—99 images from 9 domains (11 images per domain), resolution: 512×512 pixels. Submit predictions to CondaBench to obtain mIoU scores.
 
 ```python
+from datasets import load_dataset
 
+# Login using e.g. `huggingface-cli login` to access this dataset
+ds = load_dataset("XIANG-Shuai/GWFSS-competition")
 ```
 
 
