@@ -35,6 +35,9 @@ Splits: Pretraining, Train, Validation
 - [x] Training data: Supervised fine-tuning data—99 images from 9 domains (11 images per domain), resolution: 512×512 pixels
 - [x] Validation data: Used for model evaluation—99 images from 9 domains (11 images per domain), resolution: 512×512 pixels. Submit predictions to CondaBench to obtain mIoU scores.
 
+![image](https://github.com/user-attachments/assets/57e6ea98-e925-4c6f-9810-561719b84519)
+
+
 ```python
 from datasets import load_dataset
 
