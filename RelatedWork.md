@@ -1,3 +1,3 @@
-| Paper | Journal/Conference |
+| Paper/Model | Journal/Conference |
 |--|--|
 | paper | journal |
