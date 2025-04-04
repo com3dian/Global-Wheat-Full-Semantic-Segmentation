@@ -44,7 +44,7 @@ ds = load_dataset("XIANG-Shuai/GWFSS-competition")
 
 ### Related Works
 
-See [here]()
+See [here](https://github.com/com3dian/Global-Wheat-Full-Semantic-Segmentation/blob/main/RelatedWork.md)
 
 
 
