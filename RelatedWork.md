@@ -1,6 +1,7 @@
 Define your tags with emojis, like
 
 - pretrained models: 🎓
+- something else ...
 
 | Paper/Model | Journal/Conference |
 |--|--|
