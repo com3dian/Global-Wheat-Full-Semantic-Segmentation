@@ -1,1 +1,3 @@
-gwfss_competition_train/
+gwfss_competition_train/*
+gwfss_competition_val/*
+
