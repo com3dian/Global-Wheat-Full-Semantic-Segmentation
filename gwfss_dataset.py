@@ -116,7 +116,37 @@ class GWFSSDataset(Dataset):
         image = np.transpose(image, (2, 0, 1)).astype(np.float32)
         return image, class_id_img, domain
     
+class GWFSSPretrainDataset(Dataset):
+    def __init__(self, data_path: str, transform: Optional[Callable] = None):
+        '''
+        This function initializes the GWFSSPretrainDataset class.
+        '''
 
+        self.data_path = os.path.join(data_path, "gwfss_competition_pretrain")
+        self.image_files = []
+        self.domain_info = []
+
+        # the pretraining data is split into multi domains. Each domain has a folder and within each folder there are images. Since this is a pretraining dataset, we dont have masks or class ids.
+        for domain in os.listdir(self.data_path):
+            for image in os.listdir(os.path.join(self.data_path, domain)):
+                self.image_files.append(os.path.join(self.data_path, domain, image))
+                self.domain_info.append(domain)
+
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_files)
+
+    def __getitem__(self, idx):
+        image_path = self.image_files[idx]
+        domain = self.domain_info[idx]
+
+        image = Image.open(image_path)
+        if self.transform is not None:
+            image = self.transform(image)
+
+        image = image.float()
+        return image, domain
 
 
 if __name__ == "__main__":

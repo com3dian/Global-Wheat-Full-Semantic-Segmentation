@@ -1,3 +1,8 @@
 gwfss_competition_train/*
 gwfss_competition_val/*
 
+data/*
+ckpts/*
+ConvNeXt-V2/MinkowskiEngine/*
+.DS_Store
+**/__pycache__/*
