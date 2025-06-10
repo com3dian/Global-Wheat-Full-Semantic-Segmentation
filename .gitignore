@@ -6,3 +6,4 @@ ckpts/*
 ConvNeXt-V2/MinkowskiEngine/*
 .DS_Store
 **/__pycache__/*
+ConvNeXt-V2/checkpoints/*

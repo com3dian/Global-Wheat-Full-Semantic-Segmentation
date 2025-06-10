@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=pretrain
-#SBATCH --error=/lustre/scratch/WUR/AIN/nedun001/slurm_logs/slurm_%j.err
-#SBATCH --output=/lustre/scratch/WUR/AIN/nedun001/slurm_logs/slurm_%j.out
+#SBATCH --job-name=pt_exp7
+#SBATCH --error=/lustre/scratch/WUR/AIN/nedun001/slurm_logs/pt_exp7_%j.err
+#SBATCH --output=/lustre/scratch/WUR/AIN/nedun001/slurm_logs/pt_exp7_%j.out
 #SBATCH --constraint='nvidia&A100'
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
@@ -39,7 +39,25 @@ python  -u main_pretrain.py \
     --blr 1.5e-4 \
     --epochs 200 \
     --warmup_epochs 40 \
-    --data_path /lustre/scratch/WUR/AIN/nedun001/gwfss/data \
-    --output_dir /lustre/scratch/WUR/AIN/nedun001/gwfss/ConvNeXt-V2/gwfss_results_200_new \
-    --distributed False
+    --data_path /lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/data \
+    --output_dir /lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/ConvNeXt-V2/pt_exp7 \
+    --distributed False \
+    --domain_task True \
+    --edge_task False \
+    --inverse_domain_task True
 
+
+
+# python  -u main_pretrain.py \
+#     --model convnextv2_atto \
+#     --batch_size 128 \
+#     --update_freq 8 \
+#     --blr 1.5e-4 \
+#     --epochs 200 \
+#     --warmup_epochs 40 \
+#     --data_path /lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/data \
+#     --output_dir test \
+#     --distributed False \
+#     --domain_task False \
+#     --edge_task False \
+#     --inverse_domain_task False

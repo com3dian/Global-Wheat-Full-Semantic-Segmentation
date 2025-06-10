@@ -27,22 +27,20 @@ def train_one_epoch(model: torch.nn.Module,
     update_freq = args.update_freq
 
     optimizer.zero_grad()
-    for data_iter_step, (samples, domain_info) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
+    for data_iter_step, (samples, edge_image, domain_labels) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
          # we use a per iteration (instead of per epoch) lr scheduler
         if data_iter_step % update_freq == 0:
            utils.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
 
         if not isinstance(samples, list):
             samples = samples.to(device, non_blocking=True)
+            edge_image = edge_image.to(device, non_blocking=True)
+        domain_labels = domain_labels.to(device, non_blocking=True)
 
-        # the below code doesnt work since domain_info is a list of strings. We need to do some label encoding in the dataset class.
-        # if not isinstance(domain_info, list):
-        #     domain_info = domain_info.to(device, non_blocking=True)
-        # else:
-        #     domain_info = [domain_info[i].to(device, non_blocking=True) for i in range(len(domain_info))
+        # samples is a tensor of shape (B, C, H, W) and edge_image is a tensor of shape (B, 1, H, W)
+        loss, loss_dict, _, _ = model(samples, domain_labels, edge_image, mask_ratio=args.mask_ratio)
 
-        # samples is a tensor of shape (B, C, H, W)
-        loss, _, _ = model(samples, domain_info, mask_ratio=args.mask_ratio)
+        loss_dict = {k: v.item() for k, v in loss_dict.items()}
 
         loss_value = loss.item()
 
@@ -73,4 +71,7 @@ def train_one_epoch(model: torch.nn.Module,
     
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    print("image loss", loss_dict["image"])
+    print("domain loss", loss_dict["domain"]) if "domain" in loss_dict else None
+    print("edge loss", loss_dict["edges"]) if "edges" in loss_dict else None
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}, loss_dict

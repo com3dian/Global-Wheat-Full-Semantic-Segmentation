@@ -11,7 +11,7 @@ import os
 import uuid
 from pathlib import Path
 
-import main_finetune as trainer
+import main_finetune_bo as trainer
 import submitit
 
 def parse_args():
@@ -48,7 +48,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
-        import main_finetune as trainer
+        import main_finetune_bo as trainer
 
         self._setup_gpu_args()
         trainer.main(self.args)

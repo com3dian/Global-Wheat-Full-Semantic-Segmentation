@@ -10,6 +10,12 @@ def get_class_balanced_weights(samples_per_class, beta):
     Then normalize the weights so that they sum to 1.
     return shape: (num_classes,)
     """
+
+    # if samples_per_class is too large, then beta ** samples_per_class will tend to 0. 
+    # hence we scale down the samples_per_class. we can divide by the sum
+    samples_per_class = torch.tensor(samples_per_class, dtype=torch.float32)
+    samples_per_class = samples_per_class / torch.sum(samples_per_class)
+    
     effective_num = 1.0 - torch.pow(torch.tensor(beta), torch.tensor(samples_per_class, dtype=torch.float32))
     weights = (1.0 - beta) / effective_num
     weights = weights / torch.sum(weights) * len(samples_per_class)  # Normalize
@@ -24,7 +30,6 @@ def get_samples_per_class(dataset):
         for label, count in zip(class_labels, counts):
             sample_per_each_class[label] += count
 
-    print(f"samples_per_each_class: {sample_per_each_class}")
     return sample_per_each_class
 
 
@@ -60,3 +65,9 @@ class ClassBalancedFocalLoss(nn.Module):
 
         loss = -cb_weights * focal_weights * log_probs.gather(1, targets.unsqueeze(1)).squeeze(1)
         return loss.mean()
+    
+if __name__ == "__main__":
+    samples_per_class = [8570875, 2768275, 905376, 13707730]
+    beta = 0.999
+    weights = get_class_balanced_weights(samples_per_class, beta)
+    print(weights)

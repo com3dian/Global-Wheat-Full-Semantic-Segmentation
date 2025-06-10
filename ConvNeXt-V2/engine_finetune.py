@@ -208,7 +208,7 @@ def evaluate(data_loader, model, device, use_amp=False):
         output = output.argmax(dim=1)
         target = target.squeeze()
 
-
+        output = output.squeeze()
         score = metric(output.cpu(), target.cpu())
         metric_logger.meters['mIoU_class_0'].update(score[0].item())
         metric_logger.meters['mIoU_class_1'].update(score[1].item())

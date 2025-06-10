@@ -9,7 +9,8 @@ from torch.utils.data import Dataset
 from typing import Optional, Callable
 from PIL import Image
 import numpy as np
-
+import torchvision.transforms as transforms # for converting the image to a tensor  
+import cv2 as cv
 
 CLASS_LABELS = [
     {
@@ -76,6 +77,7 @@ class GWFSSDataset(Dataset):
             'names': [d['name'] for d in CLASS_LABELS]
         }
 
+
     def __normalize__(self, image):
         '''
         This function normalizes the image to be between 0 and 1 (min-max normalization).
@@ -100,6 +102,7 @@ class GWFSSDataset(Dataset):
         domain = self.domain_info[idx]
 
         image = np.array(Image.open(image_path))
+
         if self.is_train:
             mask = np.array(Image.open(mask_path))
             class_id_img = np.array(Image.open(class_id_path))
@@ -132,26 +135,53 @@ class GWFSSPretrainDataset(Dataset):
                 self.image_files.append(os.path.join(self.data_path, domain, image))
                 self.domain_info.append(domain)
 
+        self.domain_classes = list(set(self.domain_info))
+        self.domain_classes_to_idx = {domain: i for i, domain in enumerate(self.domain_classes)}
+
         self.transform = transform
 
     def __len__(self):
         return len(self.image_files)
+    
+    def edged_img(self, image, minval):
+        image_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+        edged_image = cv.Canny(image_gray, minval, 2*minval)
+        return edged_image
+
+    def __normalize__(self, image):
+        '''
+        This function normalizes the image to be between 0 and 1 (min-max normalization).
+        '''
+        return image / 255.0 
 
     def __getitem__(self, idx):
         image_path = self.image_files[idx]
         domain = self.domain_info[idx]
 
-        image = Image.open(image_path)
+        image = np.array(Image.open(image_path))
+        edge_image = self.edged_img(image, 100)    
+
+        if np.max(edge_image) > 1:
+            edge_image = self.__normalize__(edge_image)
+
+        image = self.__normalize__(image)
+
         if self.transform is not None:
             image = self.transform(image)
-
+            edge_image = self.transform(edge_image)
+        
         image = image.float()
-        return image, domain
+        edge_image = edge_image.float() 
+
+        return image, edge_image, self.domain_classes_to_idx[domain]
 
 
 if __name__ == "__main__":
-    dataset = GWFSSDataset(root_dir="/Users/vishalned/Desktop/GWFSS/")
+    dataset = GWFSSPretrainDataset(
+        data_path="/lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/data",
+        transform=transforms.ToTensor()
+    )
     print(len(dataset))
-    image, class_id_img, domain = dataset[0]
-    print(class_id_img)
-    print(image.shape, class_id_img.shape, domain)
+    image, domain = dataset[0]
+    print(image.shape, domain)
+    print(dataset.domain_classes)

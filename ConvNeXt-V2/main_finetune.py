@@ -198,7 +198,7 @@ def get_args_parser():
                         help="Use apex AMP (Automatic Mixed Precision) or not")
     parser.add_argument('--distributed', type=str2bool, default=False)
 
-    parser.add_argument('--class_weights_beta', type=float, default=0.3)
+    parser.add_argument('--class_weights_beta', type=float, default=0.99)
     parser.add_argument('--cutoff_epoch', type=int, default=0)
     return parser
 
@@ -214,12 +214,12 @@ def main(args):
     np.random.seed(seed)
     cudnn.benchmark = True
 
-    dataset_train = GWFSSDataset(root_dir="/lustre/scratch/WUR/AIN/nedun001/gwfss/data")
+    dataset_train = GWFSSDataset(root_dir="/lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/data")
 
 
     
     ########    k fold cross validation    ########
-    k_folds = 5
+    k_folds = 3
     kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
     cv_scores = []
     for fold, (train_idx, val_idx) in enumerate(kf.split(dataset_train)):
@@ -343,7 +343,7 @@ def main(args):
                 get_layer_scale=assigner.get_scale if assigner is not None else None)
             loss_scaler = NativeScaler()
 
-            class_counts = [8570875, 13707730, 2768275, 905376]
+            class_counts = [8570875, 2768275, 905376, 13707730]
             class_weights = get_class_balanced_weights(class_counts, args.class_weights_beta).to(device)
             criterion = torch.nn.CrossEntropyLoss(weight=class_weights)
             
@@ -370,19 +370,17 @@ def main(args):
 
 
             # for unet we probe the decoder only for 50 epochs, and then fine-tune for 150 epochs
-            if epoch == args.cutoff_epoch and args.cutoff_epoch > 0:
-                print("Unfreezing the encoder part of the model")
-                for param in model.parameters():
-                    param.requires_grad = True
+            # if epoch == args.cutoff_epoch and args.cutoff_epoch > 0:
+            #     print("Unfreezing the encoder part of the model")
+            #     for param in model.parameters():
+            #         param.requires_grad = True
 
-                new_param_groups = [
-                    {"params": model.downsample_layers.parameters()},
-                    {"params": model.stages.parameters()},
-                    {"params": model.initial_conv.parameters()},
-                    {"params": model.stem.parameters()}
-                ]
+            #     new_param_groups = [
+            #         {"params": model.downsample_layers.parameters()},
+            #         {"params": model.stages.parameters()},
+            #     ]
 
-                optimizer.add_param_group({"params": [p for group in new_param_groups for p in group["params"]]})
+            #     optimizer.add_param_group({"params": [p for group in new_param_groups for p in group["params"]]})
 
 
             train_stats = train_one_epoch(

@@ -24,7 +24,8 @@ import timm
 import timm.optim.optim_factory as optim_factory
 
 from engine_pretrain import train_one_epoch
-import models.fcmae as fcmae
+# import models.fcmae as fcmae
+import models.fcmae_2 as fcmae
 
 import utils
 from utils import NativeScalerWithGradNormCount as NativeScaler
@@ -103,6 +104,11 @@ def get_args_parser():
     parser.add_argument('--dist_on_itp', type=str2bool, default=False)
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
+
+    # Task parameters
+    parser.add_argument('--domain_task', type=str2bool, default=True)
+    parser.add_argument('--inverse_domain_task', type=str2bool, default=False)
+    parser.add_argument('--edge_task', type=str2bool, default=True)
     return parser
 
 def main(args):
@@ -123,7 +129,7 @@ def main(args):
     # simple augmentation
     transform_train = transforms.Compose([
             # transforms.RandomResizedCrop(args.input_size, scale=(0.2, 1.0), interpolation=3),  # 3 is bicubic
-            transforms.RandomHorizontalFlip(),
+            # transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
@@ -159,7 +165,8 @@ def main(args):
         mask_ratio=args.mask_ratio,
         decoder_depth=args.decoder_depth,
         decoder_embed_dim=args.decoder_embed_dim,
-        norm_pix_loss=args.norm_pix_loss
+        norm_pix_loss=args.norm_pix_loss,
+        args=args
     )
     model.to(device)
 
@@ -208,7 +215,7 @@ def main(args):
             data_loader_train.sampler.set_epoch(epoch)
         if log_writer is not None:
             log_writer.set_step(epoch * num_training_steps_per_epoch * args.update_freq)
-        train_stats = train_one_epoch(
+        train_stats, loss_dict = train_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
             log_writer=log_writer,

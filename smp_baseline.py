@@ -193,13 +193,13 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--visualize_predictions", action="store_true", default=False)
-    parser.add_argument("--root_dir", type=str, default="/lustre/scratch/WUR/AIN/nedun001/gwfss/data")
+    parser.add_argument("--root_dir", type=str, default="/lustre/scratch/WUR/AIN/nedun001/Global-Wheat-Full-Semantic-Segmentation/data")
     parser.add_argument("--ckpt_dir", type=str, default="./ckpts")
-    parser.add_argument("--k_folds", type=int, default=5)
-    parser.add_argument("--batch_size", type=int, default=16)
-    parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--k_folds", type=int, default=3)
+    parser.add_argument("--batch_size", type=int, default=32)
+    parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--class_weights_beta", type=float, default=0.3)
+    parser.add_argument("--class_weights_beta", type=float, default=0.99)
     args = parser.parse_args()
 
     ##### parameters to tune:
